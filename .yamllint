@@ -9,6 +9,9 @@ rules:
   line-length:
     max: 120
     level: warning
+  # kustomize edit 回写的 kustomization.yaml 顶格列表与手工缩进风格并存，只要求文件内一致
+  indentation:
+    indent-sequences: consistent
   document-start: disable
   truthy: disable
   comments-indentation: disable

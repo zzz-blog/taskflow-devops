@@ -27,7 +27,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: api
-          image: ghcr.io/zzz-blog/taskflow-devops/taskflow-api # kustomize/CD 会替换 tag
+          image: ghcr.io/zzz-blog/taskflow-devops/taskflow-api  # kustomize/CD 会替换 tag
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000

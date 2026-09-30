@@ -26,7 +26,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: web
-          image: ghcr.io/zzz-blog/taskflow-devops/taskflow-web # kustomize/CD 会替换 tag
+          image: ghcr.io/zzz-blog/taskflow-devops/taskflow-web  # kustomize/CD 会替换 tag
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
