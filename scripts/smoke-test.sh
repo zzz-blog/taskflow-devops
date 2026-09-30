@@ -20,10 +20,10 @@ curl -fsS "${API_URL:-http://127.0.0.1:8000}/healthz" >/dev/null 2>/dev/null \
 
 curl -fsS "${API_URL}/readyz" >/dev/null 2>/dev/null && pass "api 数据库就绪" || true
 
-# 通过 web 反向代理走一遍完整业务链路
+# 通过 web 反向代理走一遍完整业务链路（标题用 ASCII：Windows 终端内联中文可能非 UTF-8）
 CREATED=$(curl -fsS -X POST "${BASE_URL}/api/tasks" \
   -H "Content-Type: application/json" \
-  -d '{"title":"smoke-test 告警演练任务","priority":1}')
+  -d '{"title":"smoke-test-alert-drill","priority":1}')
 TASK_ID=$(echo "$CREATED" | grep -o '"id":[0-9]*' | head -1 | cut -d: -f2)
 [ -n "$TASK_ID" ] || fail "任务创建失败: $CREATED"
 pass "通过 nginx 代理创建任务 (id=${TASK_ID})"

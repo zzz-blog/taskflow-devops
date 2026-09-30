@@ -47,6 +47,13 @@ cd app/api
 ./mvnw verify                # JUnit 5 测试 + JaCoCo 行覆盖率 ≥ 80% 门禁
 ```
 
+前后端联调（无需 Docker，行为与 compose 中的 nginx 一致）：
+
+```bash
+python scripts/dev-proxy.py  # 静态前端 + /api 转发，等价 nginx 配置
+# 另开终端启动 API 后访问 http://127.0.0.1:8080
+```
+
 ### 方式二：Docker Compose 一键全栈（推荐演示）
 
 ```bash
