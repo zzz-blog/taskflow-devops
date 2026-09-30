@@ -1,6 +1,30 @@
 # 架构设计说明
 
-## 总体拓扑
+## 总体拓扑（Mermaid 源码版，GitHub 自动渲染）
+
+```mermaid
+flowchart LR
+    dev[开发者] -->|git push / PR| gh[GitHub]
+    gh --> ci[CI: GitHub Actions<br/>lint / test / build / trivy]
+    ci -->|通过| ghcr[(GHCR 镜像仓库)]
+    ci --> cd[CD: kustomize set image<br/>GitOps 回写清单]
+    cd --> k8s
+
+    subgraph k8s [Kubernetes / k3s 集群]
+        ingress[Ingress] --> web[web × N<br/>Nginx 前端]
+        web -->|/api 反代| api[api × N + HPA<br/>Spring Boot]
+        api --> pg[(PostgreSQL<br/>StatefulSet + PVC)]
+        prom[Prometheus] -->|ServiceMonitor 抓取| api
+    end
+
+    prom --> graf[Grafana 看板]
+    prom --> am[Alertmanager<br/>分级告警]
+    logs[容器日志] --> loki[Loki + Promtail] --> graf
+```
+
+> 精美版架构图：[architecture.svg](../images/architecture.svg)（源文件）/ [architecture.png](../images/architecture.png)（高清位图）
+
+## 全局拓扑速览
 
 ```
                 ┌────────────────────────── GitHub ──────────────────────────┐

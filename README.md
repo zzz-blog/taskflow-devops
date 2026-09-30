@@ -10,25 +10,9 @@
 
 ## 架构总览
 
-```mermaid
-flowchart LR
-    dev[开发者] -->|git push / PR| gh[GitHub]
-    gh --> ci[CI: GitHub Actions<br/>lint / test / build / trivy]
-    ci -->|通过| ghcr[(GHCR 镜像仓库)]
-    ci --> cd[CD: kustomize set image<br/>GitOps 回写清单]
-    cd --> k8s
+![TaskFlow 云原生 DevOps 端到端架构](docs/images/architecture.svg)
 
-    subgraph k8s [Kubernetes / k3s 集群]
-        ingress[Ingress] --> web[web × N<br/>Nginx 前端]
-        web -->|/api 反代| api[api × N + HPA<br/>Spring Boot]
-        api --> pg[(PostgreSQL<br/>StatefulSet + PVC)]
-        prom[Prometheus] -->|ServiceMonitor 抓取| api
-    end
-
-    prom --> graf[Grafana 看板]
-    prom --> am[Alertmanager<br/>分级告警]
-    logs[容器日志] --> loki[Loki + Promtail] --> graf
-```
+> 高清 PNG 版本见 [docs/images/architecture.png](docs/images/architecture.png)；Mermaid 源码版见 [docs/architecture.md](docs/architecture.md)。
 
 **一条完整链路**：开发者提交代码 → CI 自动完成代码检查、单元测试、镜像构建与安全扫描 → 合入 main 后自动推送镜像并回写生产清单（GitOps）→ 集群滚动更新（零停机）→ Prometheus 实时抓取指标 → Grafana 展示 → 异常触发分级告警 → 按 Runbook 处置。
 
