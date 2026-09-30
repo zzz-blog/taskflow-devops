@@ -1,0 +1,13 @@
+# 生产环境：由 CD 流水线自动更新镜像 tag（GitOps 模式）
+#   kustomize edit set image ghcr.io/example/taskflow-api=ghcr.io/<owner>/taskflow-api:<sha>
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+
+images:
+  - name: ghcr.io/example/taskflow-api
+    newTag: latest
+  - name: ghcr.io/example/taskflow-web
+    newTag: latest

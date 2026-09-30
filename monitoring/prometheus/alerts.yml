@@ -1,0 +1,63 @@
+groups:
+  - name: availability
+    rules:
+      - alert: InstanceDown
+        expr: up == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "实例掉线: {{ $labels.job }}/{{ $labels.instance }}"
+          description: "超过 2 分钟抓取失败，请检查实例状态。"
+
+      - alert: APIHighErrorRate
+        expr: >
+          sum(rate(http_server_requests_seconds_count{job="taskflow-api", status=~"5.."}[5m]))
+          / sum(rate(http_server_requests_seconds_count{job="taskflow-api"}[5m])) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "API 5xx 错误率过高"
+          description: "最近 5 分钟 5xx 错误率超过 5%（当前 {{ $value | humanizePercentage }}）。"
+
+      - alert: APIHighP95Latency
+        expr: >
+          histogram_quantile(0.95,
+            sum(rate(http_server_requests_seconds_bucket{job="taskflow-api"}[5m])) by (le)
+          ) > 0.5
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "API P95 延迟超过 500ms"
+          description: "P95 延迟 {{ $value | humanizeDuration }}，持续 10 分钟。"
+
+  - name: resources
+    rules:
+      - alert: NodeHighCPU
+        expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 85
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "节点 CPU 使用率超过 85%"
+          description: "实例 {{ $labels.instance }} CPU 使用率 {{ $value | printf \"%.1f\" }}%。"
+
+      - alert: NodeLowMemory
+        expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes < 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "节点可用内存不足 10%"
+          description: "实例 {{ $labels.instance }} 可用内存占比过低，注意 OOM 风险。"
+
+      - alert: NodeLowDiskSpace
+        expr: node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"} / node_filesystem_size_bytes{fstype!~"tmpfs|overlay"} < 0.1
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "磁盘可用空间不足 10%"
+          description: "实例 {{ $labels.instance }} 挂载点 {{ $labels.mountpoint }} 即将写满。"

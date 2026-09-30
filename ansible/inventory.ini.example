@@ -1,0 +1,7 @@
+# 复制为 inventory.ini：cp inventory.ini.example inventory.ini
+[k3s_nodes]
+# 替换为 Terraform 输出的公网 IP
+node1 ansible_host=1.2.3.4 ansible_user=root
+
+[k3s_nodes:vars]
+ansible_python_interpreter=/usr/bin/python3

@@ -1,0 +1,40 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  receiver: default
+  group_by: ["alertname", "severity"]
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+  routes:
+    - matchers:
+        - severity = "critical"
+      receiver: oncall
+      repeat_interval: 1h
+
+receivers:
+  - name: default
+    webhook_configs:
+      # 替换为你的通知渠道：企业微信/钉钉/飞书机器人的 webhook
+      - url: "http://localhost:5001/alert"
+        send_resolved: true
+  - name: oncall
+    webhook_configs:
+      - url: "http://localhost:5001/alert"
+        send_resolved: true
+    # 邮件/Slack 示例（按需打开并配置环境变量或 secret）：
+    # email_configs:
+    #   - to: "oncall@example.com"
+    #     from: "alertmanager@example.com"
+    #     smarthost: "smtp.example.com:465"
+    #     auth_username: "alertmanager@example.com"
+    #     auth_password: "${SMTP_PASSWORD}"
+
+inhibit_rules:
+  # 实例掉线时抑制该实例的其他告警，避免告警风暴
+  - source_matchers:
+      - alertname = InstanceDown
+    target_matchers:
+      - severity = "warning"
+    equal: ["instance"]

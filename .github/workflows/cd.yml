@@ -1,0 +1,123 @@
+name: CD
+
+# main 合入 → 构建/推送镜像 → GitOps 方式回写 prod overlay → （可选）kubectl 直接部署
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write # GitOps 回写 overlay 需要推代码
+  packages: write # 推送 GHCR 镜像
+
+concurrency:
+  group: cd-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-push:
+    name: 构建·扫描·推送镜像
+    runs-on: ubuntu-latest
+    outputs:
+      sha_tag: ${{ steps.vars.outputs.sha_tag }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 统一镜像名（GHCR 要求小写）
+        id: repo
+        run: echo "name=${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+
+      - id: vars
+        run: echo "sha_tag=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
+      - name: 登录 GHCR
+        if: github.event_name != 'pull_request'
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+
+      - name: 构建镜像
+        run: |
+          docker build -t taskflow-api:cd app/api
+          docker build -t taskflow-web:cd app/web
+
+      - name: Trivy 安全扫描
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: taskflow-api:cd
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "1"
+
+      - name: 推送镜像（sha / latest / 语义化版本）
+        env:
+          OWNER: ${{ steps.repo.outputs.name }}
+          REF: ${{ github.ref_name }}
+          IS_TAG: ${{ startsWith(github.ref, 'refs/tags/') }}
+        run: |
+          for svc in api web; do
+            IMAGE="ghcr.io/${OWNER}/taskflow-${svc}"
+            docker tag "taskflow-${svc}:cd" "${IMAGE}:${GITHUB_SHA::7}"
+            docker tag "taskflow-${svc}:cd" "${IMAGE}:latest"
+            if [ "$IS_TAG" = "true" ]; then
+              docker tag "taskflow-${svc}:cd" "${IMAGE}:${REF}"
+            fi
+            docker push --all-tags "$IMAGE"
+          done
+
+  gitops-bump:
+    name: GitOps 回写生产镜像版本
+    needs: build-push
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 安装 kustomize
+        run: |
+          curl -sfL "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
+          sudo mv kustomize /usr/local/bin/
+
+      - name: 更新 overlays/prod 镜像 tag
+        env:
+          OWNER: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name || github.repository }}
+          SHA_TAG: ${{ needs.build-push.outputs.sha_tag }}
+        run: |
+          IMAGE="ghcr.io/${OWNER,,}"
+          # 首次运行：把占位仓库地址替换为真实仓库（幂等，之后为空操作）
+          grep -rl "ghcr.io/example" k8s | xargs -r sed -i "s|ghcr.io/example|${IMAGE}|g"
+          cd k8s/overlays/prod
+          kustomize edit set image "${IMAGE}/taskflow-api=${IMAGE}/taskflow-api:${SHA_TAG}"
+          kustomize edit set image "${IMAGE}/taskflow-web=${IMAGE}/taskflow-web:${SHA_TAG}"
+
+      - name: 提交并推送（[skip ci] 防止循环触发）
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add k8s
+          if git diff --cached --quiet; then
+            echo "清单无变化，跳过提交"
+          else
+            git commit -m "chore(release): bump prod images to ${GITHUB_SHA::7} [skip ci]"
+            git push
+          fi
+
+  deploy:
+    name: （可选）部署到集群
+    needs: build-push
+    runs-on: ubuntu-latest
+    env:
+      KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: kubectl apply -k k8s/overlays/prod
+        if: env.KUBE_CONFIG != ''
+        run: |
+          echo "${KUBE_CONFIG}" > kubeconfig.yaml
+          chmod 600 kubeconfig.yaml
+          curl -sfLo kubectl "https://dl.k8s.io/release/v1.31.3/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          ./kubectl --kubeconfig kubeconfig.yaml apply -k k8s/overlays/prod
+          ./kubectl --kubeconfig kubeconfig.yaml rollout status deployment/api -n taskflow --timeout=180s

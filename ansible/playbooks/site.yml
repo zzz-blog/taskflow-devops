@@ -1,0 +1,7 @@
+# 裸机 -> 可用集群：安装基础工具 + k3s
+- name: 初始化 k3s 节点
+  hosts: k3s_nodes
+  become: true
+  roles:
+    - common
+    - k3s

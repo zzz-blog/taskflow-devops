@@ -1,0 +1,23 @@
+# 开发环境：单副本、放宽资源、隔离命名空间 taskflow-dev
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: taskflow-dev
+
+resources:
+  - ../../base
+
+patches:
+  - path: patch-replicas.yaml
+    target:
+      kind: Deployment
+      name: .*
+  - path: patch-hpa.yaml
+    target:
+      kind: HorizontalPodAutoscaler
+      name: api
+
+images:
+  - name: ghcr.io/example/taskflow-api
+    newTag: latest
+  - name: ghcr.io/example/taskflow-web
+    newTag: latest

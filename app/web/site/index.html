@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TaskFlow · 任务看板</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">⚡</span>
+      <div>
+        <h1>TaskFlow</h1>
+        <p>云原生 DevOps 实践平台 · 示例应用</p>
+      </div>
+    </div>
+    <div class="status">
+      <span id="api-status" class="dot"></span>
+      <span id="api-status-text">检测中…</span>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="stats-row">
+      <div class="stat-card"><span id="stat-total" class="stat-num">–</span><span>全部任务</span></div>
+      <div class="stat-card"><span id="stat-todo" class="stat-num">–</span><span>进行中</span></div>
+      <div class="stat-card"><span id="stat-done" class="stat-num">–</span><span>已完成</span></div>
+    </section>
+
+    <section class="card form-card">
+      <h2>新建任务</h2>
+      <form id="task-form">
+        <input id="f-title" type="text" placeholder="任务标题（必填）" maxlength="200" required />
+        <input id="f-desc" type="text" placeholder="描述（可选）" maxlength="2000" />
+        <select id="f-priority">
+          <option value="1">🔴 高优先级</option>
+          <option value="2" selected>🟡 中优先级</option>
+          <option value="3">🟢 低优先级</option>
+        </select>
+        <button type="submit">添加</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <div class="list-head">
+        <h2>任务列表</h2>
+        <div class="filters" id="filters">
+          <button data-f="all" class="active">全部</button>
+          <button data-f="todo">进行中</button>
+          <button data-f="done">已完成</button>
+        </div>
+      </div>
+      <ul id="task-list" class="task-list"></ul>
+      <p id="empty-hint" class="empty hidden">暂无任务，先添加一个吧 🎉</p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span id="build-info">TaskFlow API</span> · 前端 Nginx → 后端 Spring Boot → PostgreSQL
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

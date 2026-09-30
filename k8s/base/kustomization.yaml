@@ -1,0 +1,27 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - secret.yaml
+  - postgres-service.yaml
+  - postgres-statefulset.yaml
+  - api-deployment.yaml
+  - web-deployment.yaml
+  - services.yaml
+  - ingress.yaml
+  - hpa.yaml
+  - servicemonitor.yaml
+
+# 替换镜像仓库地址（三选一即可）：
+#   kustomize edit set image ghcr.io/example/taskflow-api=ghcr.io/<你的用户名>/taskflow-api
+#   或由 CD 流水线自动写入 newTag
+images:
+  - name: ghcr.io/example/taskflow-api
+    newTag: latest
+  - name: ghcr.io/example/taskflow-web
+    newTag: latest
+
+commonLabels:
+  app.kubernetes.io/part-of: taskflow

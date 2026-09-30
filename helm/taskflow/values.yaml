@@ -1,0 +1,46 @@
+# helm install taskflow ./helm/taskflow -n taskflow --create-namespace
+
+fullnameOverride: ""
+
+api:
+  image:
+    repository: ghcr.io/example/taskflow-api
+    tag: latest
+  replicas: 2
+  resources:
+    requests: { cpu: 100m, memory: 128Mi }
+    limits: { cpu: 500m, memory: 512Mi }
+  env:
+    TASKFLOW_ENVIRONMENT: helm
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 6
+    targetCPUUtilizationPercentage: 70
+
+web:
+  image:
+    repository: ghcr.io/example/taskflow-web
+    tag: latest
+  replicas: 2
+  resources:
+    requests: { cpu: 50m, memory: 64Mi }
+    limits: { cpu: 200m, memory: 128Mi }
+
+service:
+  type: ClusterIP
+  apiPort: 8000
+  webPort: 8080
+
+ingress:
+  enabled: true
+  className: nginx
+  host: taskflow.local
+
+monitoring:
+  serviceMonitor:
+    enabled: true
+    interval: 15s
+    # 与 kube-prometheus-stack 的 serviceMonitorSelector 匹配
+    labels:
+      release: kube-prometheus-stack

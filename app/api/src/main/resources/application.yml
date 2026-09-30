@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: taskflow-api
+  datasource:
+    # 默认 H2 内存库（本地开发/测试）；compose 与 K8s 通过 DATABASE_URL 注入 PostgreSQL
+    url: ${DATABASE_URL:jdbc:h2:mem:taskflow;DB_CLOSE_DELAY=-1}
+    username: ${DATABASE_USERNAME:sa}
+    password: ${DATABASE_PASSWORD:}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: ${JPA_DDL_AUTO:update}
+
+server:
+  port: 8000
+  # K8s 滚动更新时优雅下线，配合 terminationGracePeriodSeconds
+  shutdown: graceful
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  health:
+    probes:
+      enabled: true
+
+taskflow:
+  app-version: 1.0.0
+  environment: ${TASKFLOW_ENVIRONMENT:local}
+
+# 结构化 JSON 日志（Boot 3.4 原生支持），stdout 采集进 Loki 零解析成本
+logging:
+  structured:
+    format:
+      console: logstash

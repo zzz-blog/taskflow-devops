@@ -1,0 +1,26 @@
+---
+- name: 安装 k3s（单节点 server）
+  ansible.builtin.shell: |
+    set -o pipefail
+    curl -sfL https://get.k3s.io | sh -s - --write-kubeconfig-mode 6443
+  args:
+    executable: /bin/bash
+    creates: /usr/local/bin/k3s
+
+- name: 确保 k3s 服务运行
+  ansible.builtin.systemd:
+    name: k3s
+    state: started
+    enabled: true
+
+- name: 验证节点 Ready
+  ansible.builtin.command: k3s kubectl get nodes
+  register: nodes
+  retries: 30
+  delay: 5
+  until: "'Ready' in nodes.stdout"
+  changed_when: false
+
+- name: 输出节点状态
+  ansible.builtin.debug:
+    var: nodes.stdout_lines

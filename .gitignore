@@ -1,0 +1,40 @@
+# Java / Maven
+target/
+*.class
+.mvn/wrapper/maven-wrapper.jar
+
+# Python（历史遗留目录，保留以防本地残留）
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+*.egg-info/
+
+# Local env & secrets
+.env
+*.local.yaml
+
+# Local data
+data/
+backups/
+*.log
+
+# Terraform
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+terraform/terraform.tfstate*
+terraform/*.tfplan
+
+# Ansible
+ansible/*.retry
+ansible/inventory.ini
+
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,18 @@
+# 依赖 kube-prometheus-stack 中的 Prometheus Operator
+#   helm install monitoring prometheus-community/kube-prometheus-stack -n monitoring --create-namespace
+# 若 Prometheus 自定义 selector（release 标签），请按实际值修改下方 labels
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: taskflow-api
+  namespace: taskflow
+  labels:
+    release: kube-prometheus-stack # 与 Prometheus 实例的 serviceMonitorSelector 匹配
+spec:
+  selector:
+    matchLabels:
+      app: taskflow-api
+  endpoints:
+    - port: http
+      path: /actuator/prometheus
+      interval: 15s

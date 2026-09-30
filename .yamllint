@@ -1,0 +1,10 @@
+# yamllint 配置：CI 中对所有 YAML 做规范检查
+extends: default
+
+rules:
+  line-length:
+    max: 120
+    level: warning
+  document-start: disable
+  truthy: disable
+  comments-indentation: disable
