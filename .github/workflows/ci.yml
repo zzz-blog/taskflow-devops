@@ -34,11 +34,17 @@ jobs:
         with:
           dockerfile: app/web/Dockerfile
 
-      - name: kubeconform（K8s 清单 Schema 校验）
-        run: >
-          docker run --rm -v "$PWD:/work" -w /work ghcr.io/yannh/kubeconform:v0.6.7
-          -ignore-missing-schemas -summary
-          k8s/base k8s/overlays/dev k8s/overlays/prod
+      - name: kubeconform（K8s 清单 Schema 校验，含 Kustomize 渲染结果）
+        run: |
+          set -o pipefail
+          curl -sfL "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
+          sudo mv kustomize /usr/local/bin/
+          # 校验渲染后的最终清单，而非源文件：patch 片段本身不是完整资源
+          for env in base overlays/dev overlays/prod; do
+            echo "== kustomize build k8s/$env =="
+            kustomize build "k8s/$env" | \
+              docker run --rm -i ghcr.io/yannh/kubeconform:v0.6.7 -ignore-missing-schemas -summary -
+          done
 
       - name: Helm Chart lint
         uses: azure/setup-helm@v4
