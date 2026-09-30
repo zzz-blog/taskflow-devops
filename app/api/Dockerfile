@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # ---- 构建阶段：Maven 编译打包（.m2 走 BuildKit 缓存，重复构建显著提速）----
-FROM maven:3.9-eclipse-temurin-21 AS build
+FROM maven:3-eclipse-temurin-26 AS build
 WORKDIR /build
 COPY pom.xml .
 RUN --mount=type=cache,target=/root/.m2 mvn -B -q dependency:go-offline
