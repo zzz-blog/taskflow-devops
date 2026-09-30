@@ -17,7 +17,7 @@ patches:
       name: api
 
 images:
-  - name: ghcr.io/example/taskflow-api
+  - name: ghcr.io/zzz-blog/taskflow-devops/taskflow-api
     newTag: latest
-  - name: ghcr.io/example/taskflow-web
+  - name: ghcr.io/zzz-blog/taskflow-devops/taskflow-web
     newTag: latest

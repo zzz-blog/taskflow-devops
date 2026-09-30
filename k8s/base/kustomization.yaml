@@ -15,12 +15,12 @@ resources:
   - servicemonitor.yaml
 
 # 替换镜像仓库地址（三选一即可）：
-#   kustomize edit set image ghcr.io/example/taskflow-api=ghcr.io/<你的用户名>/taskflow-api
+#   kustomize edit set image ghcr.io/zzz-blog/taskflow-devops/taskflow-api=ghcr.io/<你的用户名>/taskflow-api
 #   或由 CD 流水线自动写入 newTag
 images:
-  - name: ghcr.io/example/taskflow-api
+  - name: ghcr.io/zzz-blog/taskflow-devops/taskflow-api
     newTag: latest
-  - name: ghcr.io/example/taskflow-web
+  - name: ghcr.io/zzz-blog/taskflow-devops/taskflow-web
     newTag: latest
 
 commonLabels:
