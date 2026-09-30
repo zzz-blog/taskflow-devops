@@ -50,6 +50,14 @@ jobs:
           ignore-unfixed: true
           exit-code: "1"
 
+      - name: Trivy 安全扫描（web）
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: taskflow-web:cd
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "1"
+
       - name: 推送镜像（sha / latest / 语义化版本）
         env:
           OWNER: ${{ steps.repo.outputs.name }}
