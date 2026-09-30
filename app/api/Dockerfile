@@ -9,7 +9,7 @@ RUN --mount=type=cache,target=/root/.m2 mvn -B -q package -DskipTests \
     && cp target/taskflow-api-*.jar target/app.jar
 
 # ---- 运行阶段：Alpine JRE + 非 root 用户（busybox wget 提供健康检查，无需 apt）----
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:25-jre-alpine
 RUN addgroup -S app && adduser -S -u 10001 -G app appuser
 WORKDIR /app
 COPY --from=build /build/target/app.jar app.jar
