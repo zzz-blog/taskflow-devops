@@ -94,7 +94,7 @@ jobs:
           docker build -t taskflow-web:ci app/web
 
       - name: Trivy 漏洞扫描（CRITICAL/HIGH 未修复项即失败）
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: taskflow-api:ci
           severity: CRITICAL,HIGH

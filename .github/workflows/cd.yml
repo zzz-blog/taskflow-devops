@@ -43,7 +43,7 @@ jobs:
           docker build -t taskflow-web:cd app/web
 
       - name: Trivy 安全扫描
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: taskflow-api:cd
           severity: CRITICAL,HIGH

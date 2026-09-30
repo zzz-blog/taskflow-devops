@@ -1,7 +1,7 @@
 # Dependabot：依赖与 Actions 版本的自动升级 PR
 version: 2
 updates:
-  - package-ecosystem: pip
+  - package-ecosystem: maven
     directory: /app/api
     schedule:
       interval: weekly
