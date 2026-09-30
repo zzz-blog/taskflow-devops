@@ -60,4 +60,4 @@ groups:
           severity: critical
         annotations:
           summary: "磁盘可用空间不足 10%"
-          description: "实例 {{ $labels.instance }} 挂载点 {{ $labels.mountpoint }} 即将写满。"
+          description: "实例 {{ $labels.instance }} 的 {{ $labels.mountpoint }} 即将写满。"

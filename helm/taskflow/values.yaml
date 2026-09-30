@@ -8,8 +8,12 @@ api:
     tag: latest
   replicas: 2
   resources:
-    requests: { cpu: 100m, memory: 128Mi }
-    limits: { cpu: 500m, memory: 512Mi }
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
   env:
     TASKFLOW_ENVIRONMENT: helm
   autoscaling:
@@ -24,8 +28,12 @@ web:
     tag: latest
   replicas: 2
   resources:
-    requests: { cpu: 50m, memory: 64Mi }
-    limits: { cpu: 200m, memory: 128Mi }
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
 
 service:
   type: ClusterIP

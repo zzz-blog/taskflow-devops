@@ -1,6 +1,10 @@
 # yamllint 配置：CI 中对所有 YAML 做规范检查
 extends: default
 
+# Helm 模板是 Go template，渲染前不是合法 YAML，由 helm lint 单独校验
+ignore: |
+  helm/taskflow/templates/
+
 rules:
   line-length:
     max: 120
