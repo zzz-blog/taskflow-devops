@@ -22,7 +22,7 @@ jobs:
     outputs:
       sha_tag: ${{ steps.vars.outputs.sha_tag }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: 统一镜像名（GHCR 要求小写）
         id: repo
@@ -72,7 +72,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: 安装 kustomize
         run: |
@@ -110,7 +110,7 @@ jobs:
     env:
       KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: kubectl apply -k k8s/overlays/prod
         if: env.KUBE_CONFIG != ''
