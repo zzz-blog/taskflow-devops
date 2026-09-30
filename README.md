@@ -2,7 +2,8 @@
 
 一个从代码提交到生产发布全链路自动化的 DevOps 综合项目：**示例微服务应用 + CI/CD 流水线 + Kubernetes 编排 + 可观测性 + IaC**，覆盖 DevOps 工程师的完整技能地图。
 
-![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions)
+[![CI](https://github.com/zzz-blog/taskflow-devops/actions/workflows/ci.yml/badge.svg)](https://github.com/zzz-blog/taskflow-devops/actions/workflows/ci.yml)
+[![CD](https://github.com/zzz-blog/taskflow-devops/actions/workflows/cd.yml/badge.svg)](https://github.com/zzz-blog/taskflow-devops/actions/workflows/cd.yml)
 ![K8s](https://img.shields.io/badge/K8s-Kustomize%20%2B%20Helm-326CE5?logo=kubernetes)
 ![Monitoring](https://img.shields.io/badge/Observability-Prometheus%20%2B%20Grafana%20%2B%20Loki-E6522C)
 ![License](https://img.shields.io/badge/License-MIT-green)
