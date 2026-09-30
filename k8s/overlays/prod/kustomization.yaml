@@ -9,7 +9,7 @@ resources:
 images:
 - name: ghcr.io/zzz-blog/taskflow-devops/taskflow-api
   newName: ghcr.io/zzz-blog/taskflow-devops/taskflow-api
-  newTag: 31817a6
+  newTag: f81b12f
 - name: ghcr.io/zzz-blog/taskflow-devops/taskflow-web
   newName: ghcr.io/zzz-blog/taskflow-devops/taskflow-web
-  newTag: 31817a6
+  newTag: f81b12f
