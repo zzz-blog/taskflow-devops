@@ -26,11 +26,11 @@ jobs:
           yamllint .
 
       - name: hadolint（Dockerfile 规范）
-        uses: hadolint/hadolint-action@v3.1.0
+        uses: hadolint/hadolint-action@v3.5.0
         with:
           dockerfile: app/api/Dockerfile
 
-      - uses: hadolint/hadolint-action@v3.1.0
+      - uses: hadolint/hadolint-action@v3.5.0
         with:
           dockerfile: app/web/Dockerfile
 
