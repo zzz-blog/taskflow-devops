@@ -7,10 +7,14 @@ resources:
   - ../../base
 
 patches:
-  - path: patch-replicas.yaml
+  - path: patch-api-replicas.yaml
     target:
       kind: Deployment
-      name: .*
+      name: api
+  - path: patch-web-replicas.yaml
+    target:
+      kind: Deployment
+      name: web
   - path: patch-hpa.yaml
     target:
       kind: HorizontalPodAutoscaler
